@@ -1,3 +1,16 @@
+Metadata-Version: 2.1
+Name: senaite.astm
+Version: 1.0.0
+Home-page: 
+Author: 
+Author-email: 
+License: GPLv2
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+Provides-Extra: dev
+
 # SENAITE ASTM
 
 Middleware to communicate between SENAITE and clinical and laboratory
@@ -6,6 +19,7 @@ instruments using ASTM specifications.
 This program uses Python `asyncio` to receive ASTM messages on a given IP and
 Port. `asyncio` is a library to write concurrent code using the async/await
 syntax and needs therefore requires Python 3.6.x or higher.
+
 
 ## Installation
 
@@ -46,37 +60,12 @@ The script `senaite-astm-server` allows to start the server:
                             Time delay in seconds between retries when SENAITE instance is not reachable. Only has
                             effect when argument --url is set (default: 5**
 
+
 **Note ☝️:**
-The push consumer endpoint `senaite.lis2a.import` does currently not support the
+The push consuer endpoint `senaite.lis2a.import` does currently not support the
 full messages (including control characters) sent by `senaite.astm`.
 Therefore, it requires to register a custom endpoint for doing the results import.
 
-## Commands
-
-```
-senaite-astm-server -u http://admin:password@localhost:8081/senaite
-senaite-astm-send -u http://admin:password@localhost:8081/senaite -i src/senaite/astm/data/cobas.txt
-```
-
-## Errors
-
-```
-Traceback (most recent call last):
-  File "/home/senaite/buildout-cache/eggs/cp27mu/plone.jsonapi.core-0.7.0-py2.7.egg/plone/jsonapi/core/browser/decorators.py", line 23, in decorator
-    return f(*args, **kwargs)
-  File "/home/senaite/buildout-cache/eggs/cp27mu/plone.jsonapi.core-0.7.0-py2.7.egg/plone/jsonapi/core/browser/api.py", line 57, in to_json
-    return self.dispatch()
-  File "/home/senaite/buildout-cache/eggs/cp27mu/plone.jsonapi.core-0.7.0-py2.7.egg/plone/jsonapi/core/browser/api.py", line 51, in dispatch
-    return router(self.context, self.request, path)
-  File "/home/senaite/buildout-cache/eggs/cp27mu/plone.jsonapi.core-0.7.0-py2.7.egg/plone/jsonapi/core/browser/router.py", line 150, in __call__
-    return self.view_functions[endpoint](context, request, **values)
-  File "/home/senaite/buildout-cache/eggs/cp27mu/senaite.jsonapi-2.3.0-py2.7.egg/senaite/jsonapi/v1/routes/push.py", line 61, in push
-    api.fail(500, str(e))
-  File "/home/senaite/buildout-cache/eggs/cp27mu/senaite.jsonapi-2.3.0-py2.7.egg/senaite/jsonapi/api.py", line 572, in fail
-    raise APIError(status, "{}".format(msg))
-APIError: Messages are not LIS2-A compliant
-
-```
 
 ## Custom push consumer
 
@@ -107,7 +96,7 @@ The implementation in the `lis2a` module should look like this:
             """
             # Extract LIS2-A messages from the data
             messages = self.data.get("messages")
-
+            
             # parse and import the messages ...
 
             return True

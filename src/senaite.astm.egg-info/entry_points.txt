@@ -1,0 +1,3 @@
+[console_scripts]
+senaite-astm-send = senaite.astm.sender:main
+senaite-astm-server = senaite.astm.server:main

@@ -11,7 +11,10 @@ from time import sleep
 
 from senaite.astm import lims
 from senaite.astm import logger
+from senaite.astm.lims import post_to_senaite
 from senaite.astm.protocol import ASTMProtocol
+
+LOGFILE = "senaite-astm-server.log"
 
 
 async def consume(queue, callback=None):
@@ -31,47 +34,6 @@ def write_message(message, path, ext=".txt"):
     filename = "{}{}".format(timestamp, ext)
     with open(os.path.join(path, filename), "wb") as f:
         f.write(message)
-
-
-def post_to_senaite(message, session, **kwargs):
-    """POST ASTM message to SENAITE
-    """
-    attempt = 1
-    retries = kwargs.get('retries', 3)
-    delay = kwargs.get('delay', 5)
-    consumer = kwargs.get('consumer', 'senaite.lis2a.import')
-    success = False
-
-    while True:
-        # Open a session with SENAITE and authenticate
-        authenticated = session.auth()
-        # Build the POST payload
-        payload = {
-            'consumer': consumer,
-            'messages': [message],
-        }
-        if authenticated:
-            # Send the message
-            response = session.post('push', payload)
-            success = response.get('success')
-            if success:
-                break
-
-        # the break here ensures that at least one time is tried
-        if attempt >= retries:
-            break
-
-        # increase attempts
-        attempt += 1
-
-        logger.warn('Could not push. Retrying {}/{}'.format(
-            attempt, retries))
-
-        # Sleep before we retry
-        sleep(delay)
-
-    if not success:
-        logger.error('Could not push the message')
 
 
 def main():
@@ -141,8 +103,24 @@ def main():
         action='store_true',
         help='Verbose logging')
 
+    parser.add_argument(
+        '--logfile',
+        default=LOGFILE,
+        help='Path to store log files')
+
     # Parse Arguments
     args = parser.parse_args()
+
+    if args.logfile:
+        handler = logging.handlers.RotatingFileHandler(
+            args.logfile, maxBytes=5, backupCount=0)
+        # Format each log message like this
+        formatter = logging.Formatter(
+            '%(asctime)s %(levelname)-8s %(message)s')
+        # Attach the formatter to the handler
+        handler.setFormatter(formatter)
+        # Attach the handler to the logger
+        logger.addHandler(handler)
 
     # Get the current event loop.
     loop = asyncio.get_event_loop()
